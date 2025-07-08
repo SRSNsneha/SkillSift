@@ -22,14 +22,14 @@ SkillSift is a smart resume analyzer built using Flask that provides two powerfu
 ---
 
 ### 📚 Feature 2: Multi-Resume Ranker with Storage
-- Enter a **custom user ID** to store all your resumes privately.
+- Enter a **User ID** to store all your resumes privately.
 - Upload multiple resumes under one user ID.
 - Paste a job description to:
   - Rank all uploaded resumes by **match percentage**
-  - View matched and missing skills for top 3 resumes
+  - View matched and missing skills for the top 3 resumes, with a download option for each.
 - Uses **TF-IDF + Cosine Similarity** for intelligent ranking.
 
-> 📂 Your data is separated by ID – no login required. You can also clear all resumes under your ID.
+> 📂 Your data is linked to a unique ID – no login is needed. You can also clear all resumes under your ID if you'd like to upload a new set without the previously uploaded ones for comparison.
 
 ---
 

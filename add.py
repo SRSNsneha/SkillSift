@@ -1,18 +1,5 @@
 import pandas as pd
-new_skills= [
-    "Neuro-symbolic AI",
-    "Bioinformatics scripting",
-    "Quantum-resistant cryptography",
-    "Edge AI deployment",
-    "Ambient computing integration",
-    "Wearable tech prototyping",
-    "AI ethics compliance modeling",
-    "Zero UI design frameworks",
-    "Affective computing systems",
-    "Swarm robotics coordination",
-    "Holographic interfaces",
-    "Neural dust sensors"
-]
+new_skills= [] #add new skills to add in the csv file here.
 
 # Load existing CSV
 df = pd.read_csv("skills_dataset.csv")
