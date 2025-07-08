@@ -1,8 +1,8 @@
 const images = [
-  'url("/static/resume 3.png")',
-  'url("/static/resume 6.png")',
-  'url("/static/resume 7.png")',
-  'url("/static/resume 8.png")',
+  'url("./static/resume3.png")',
+  'url("./static/resume6.png")',
+  'url("./static/resume7.png")',
+  'url("./static/resume8.png")',
   
 ];
 

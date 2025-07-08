@@ -3,7 +3,7 @@
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(to bottom right, #f9f9ff, #e0e7ff);
-  background-image: url('/static/resume\ 3.png'); /* Path to your image */
+  background-image: url('./resume3.png'); /* Path to your image */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
