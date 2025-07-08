@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #f4f4f4;
+  background-image: url('/static/resume\ 4.png'); /* Path to your image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color:aliceblue
+}
+h1{
+  text-align: center;
+}
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: rgb(6, 6, 6);
+  padding: 20px;
+  border-radius: 10px;
+}
+button {
+  margin-top: 10px;
+}
+textarea, input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+}
+.resume-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 15px;
+  padding: 15px;
+  background: #090909;
+}
+.status {
+  font-weight: bold;
+  margin-top: 5px;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Analyzer</title>
+  <link rel="stylesheet" href="/static/feature1.css" />
+</head>
+<body>
+  <div class="container">
+  <h1>Resume Analyzer</h1>
+  <form id="upload-form">
+  <label for="resume">Upload Resume (PDF):</label>
+  <input type="file" id="resume" accept=".pdf" required />
+
+  <label for="job-description">Paste Job Description:</label>
+  <textarea id="job-description" placeholder="Paste job description here..." rows="5" cols="50"></textarea>
+
+
+  <button type="submit">Analyze Resume</button>
+</form>
+
+
+    <div id="result" class="hidden">
+      <h2>Extracted Information</h2>
+      <p><strong>Email:</strong> <span id="email"></span></p>
+      <p><strong>Phone:</strong> <span id="phone"></span></p>
+      <h3>Education:</h3>
+      <ul id="education"></ul>
+      <h3 id="match-percentage"></h3>
+      <h3>Matched Skills:</h3>
+      <ul id="matched-skills"></ul>
+
+      <h3>Missing Skills:</h3>
+      <ul id="missing-skills"></ul>
+     </div>
+  </div>
+  <script src="/static/feature1.js"></script>
+</body>
+</html>

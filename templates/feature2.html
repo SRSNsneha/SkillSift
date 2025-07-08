@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Analyzer</title>
+  <link rel="stylesheet" href="/static/feature2.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Resume Analyzer</h1>
+
+    <!-- Upload Resume -->
+    <form id="uploadForm">
+      <label for="file">Upload Resume (PDF):</label>
+      <input type="file" name="file" id="file" required>
+      <input type="text" name="name_id" placeholder="Enter Resume ID" required>
+      <button type="submit">Upload</button>
+      <p id="uploadMsg" class="status"></p>
+    </form>
+
+    <!-- Disclaimer -->
+    <p style="color: red; font-weight: bold;">
+      ⚠️ Disclaimer: Please use a unique Resume ID and click "🧹 Clear All Resumes" if you want to upload and compare a new set of resumes.
+    </p>
+  
+
+
+    <!-- Analyze Section -->
+<form id="analyzeForm">
+  <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required>
+  <textarea id="required_skills" rows="6" placeholder="Paste job description here..." required></textarea>
+  <button type="submit">Analyze</button>
+</form>
+
+
+    <!-- Results Display -->
+    <div id="results"></div>
+
+    <!-- Clear Button -->
+    <button id="clearBtn">🧹 Clear All Resumes</button>
+  </div>
+
+  <script src="/static/feature2.js"></script>
+</body>
+</html>

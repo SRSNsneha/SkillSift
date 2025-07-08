@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Analyzer Home</title>
+  <link rel="stylesheet" href="/static/home.css">
+   <link rel="preload" href="/static/resume 3.png" as="image">
+  <link rel="preload" href="/static/resume 6.png" as="image">
+  <link rel="preload" href="/static/resume 7.png" as="image">
+  <link rel="preload" href="/static/resume 8.png" as="image">
+</head>
+<body>
+  <button class="switch-btn" onclick="cycleBackground()">Change Background</button>
+
+  <div class="dot-container">
+    <span class="dot" id="dot0"></span>
+    <span class="dot" id="dot1"></span>
+    <span class="dot" id="dot2"></span>
+    <span class="dot" id="dot3"></span>
+  </div>
+
+  <div class="container">
+    <h1>SkillSift</h1>
+    <div class="features">
+      <div class="card">
+        <h2>Feature 1: Single Resume Skill Match</h2>
+        <p>Upload a resume and compare it against a job description to identify matched skills and evaluate relevance.</p>
+        <a href="/feature1"><button>Go to Feature 1</button></a>
+      </div>
+
+      <div class="card">
+        <h2>Feature 2: Multi Resume Ranking</h2>
+        <p>Upload multiple resumes, compare them to a job description, and get the top 3 best matches ranked automatically.</p>
+        <a href="/feature2"><button>Go to Feature 2</button></a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/home.js"></script>
+</body>
+</html>
