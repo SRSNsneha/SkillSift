@@ -66,7 +66,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
       resultDiv.innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
     }
   } catch (err) {
-    resultDiv.innerHTML = "<p style='color:red'>❌ Error connecting to backend.</p>";
+    resultDiv.innerHTML = "<p style='color:red'>❌ Error connecting...Please Wait.</p>";
   }
 });
 
