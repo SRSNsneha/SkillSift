@@ -7,7 +7,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   msg.textContent = "Uploading...";
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/store_resume", {
+    const res = await fetch("https://skillsift.onrender.com/store_resume", {
       method: "POST",
       body: formData,
     });
@@ -29,7 +29,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   resultDiv.innerHTML = "<p>Analyzing...</p>";
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/match_resumes", {
+    const res = await fetch("https://skillsift.onrender.com/match_resumes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ job_description: jobDesc, name_id: userId }),
@@ -43,7 +43,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
         const fileName = r.file_name;
 
         // Fetch download URL dynamically
-        const downloadRes = await fetch(`http://127.0.0.1:5000/download_resume/${userId}/${fileName}`);
+        const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${fileName}`);
         const downloadData = await downloadRes.json();
         const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
 
@@ -77,7 +77,7 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
   msg.textContent = "Clearing resumes...";
 
   try {
-    const res = await fetch(`http://127.0.0.1:5000/clear_resumes?name_id=${userId}`, {
+    const res = await fetch(`https://skillsift.onrender.com/clear_resumes?name_id=${userId}`, {
       method: "DELETE",
     });
     const data = await res.json();
