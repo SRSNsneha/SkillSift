@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 20px;
   background: #121d3a; /* Dark blue fallback */
-  background-image: url('./resume4.png'); /* your dark blue bg image */
+  background-image: url('resume4.png'); /* your dark blue bg image */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
