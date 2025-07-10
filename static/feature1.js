@@ -53,7 +53,7 @@ document.getElementById("upload-form").addEventListener("submit", async function
     });
 
   } catch (err) {
-    alert("Error analyzing resume. Check backend and try again.");
+    alert("Error analyzing resume.Please wait and try again.");
     console.error(err);
   }
 });

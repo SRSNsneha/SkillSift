@@ -1,39 +1,163 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f4f4f4;
-  background-image: url('resume4.png'); /* Path to your image */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #121d3a; /* Dark blue fallback */
+  background-image: url('/static/resume4.png'); /* your dark blue bg image */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color:aliceblue
+  color: #e0e7f1;
+  min-height: 100vh;
 }
-h1{
+
+h1 {
   text-align: center;
+  margin-bottom: 25px;
+  font-size: 38px;
+  font-weight: 900;
+
+  /* Multi-colored gradient fitting dark blue */
+  background: linear-gradient(135deg,
+    #4facfe,  /* light blue */
+    #00f2fe,  /* cyan */
+    #a18cd1,  /* light purple */
+    #fbc7a4,  /* peach */
+    #654ea3   /* dark violet */
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
+
 .container {
   max-width: 800px;
   margin: auto;
-  background: rgb(6, 6, 6);
-  padding: 20px;
-  border-radius: 10px;
+  background: rgba(8, 15, 42, 0.75); /* dark blue semi-transparent */
+  padding: 35px 30px;
+  border-radius: 14px;
+  box-shadow: 0 0 30px rgba(79, 172, 254, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
 }
-button {
-  margin-top: 10px;
+
+form {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-textarea, input[type="text"] {
+
+label {
+  font-weight: 700;
+  color: #a8b6d9;
+  font-size: 15px;
+}
+
+input[type="file"],
+input[type="text"],
+textarea {
   width: 100%;
-  padding: 8px;
-  margin-top: 10px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  background-color: rgba(40, 55, 95, 0.5);
+  color: #e0e7f1;
+  box-shadow: inset 0 0 8px rgba(79, 172, 254, 0.6);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  resize: vertical;
 }
-.resume-card {
-  border: 1px solid #ccc;
+
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, #4facfe, #654ea3);
+  color: white;
+  padding: 8px 18px;
+  border: none;
   border-radius: 8px;
-  margin-top: 15px;
-  padding: 15px;
-  background: #090909;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
 }
+
+input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, #00f2fe, #a18cd1);
+}
+
+input[type="file"]:focus,
+textarea:focus,
+input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 12px 3px #00f2fe;
+  background-color: rgba(40, 55, 95, 0.75);
+}
+
+button {
+  align-self: center;
+  padding: 14px 42px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+
+  /* Default gradient: blue to purple */
+  background: linear-gradient(135deg, #4facfe, #654ea3);
+  color: white;
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+}
+
+button:hover {
+  /* Hover gradient: cyan to peach */
+  background: linear-gradient(135deg, #00f2fe, #fbc7a4);
+  box-shadow: 0 8px 28px rgba(255, 199, 164, 0.8);
+  transform: scale(1.05);
+}
+
 .status {
-  font-weight: bold;
-  margin-top: 5px;
+  font-weight: 700;
+  margin-top: 12px;
+  color: #fbc7a4;
+}
+
+.resume-card {
+  background: rgba(30, 40, 75, 0.75);
+  border-radius: 12px;
+  padding: 22px;
+  margin-top: 25px;
+  border-left: 6px solid #4facfe;
+  box-shadow: 0 0 15px rgba(79, 172, 254, 0.35);
+}
+
+.resume-card h3, 
+.resume-card p {
+  margin: 10px 0;
+  color: #cfd8f7;
+}
+
+.resume-card button {
+  background: linear-gradient(135deg, #4facfe, #654ea3);
+  color: white;
+  padding: 9px 18px;
+  border-radius: 6px;
+  border: none;
+  margin-top: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.resume-card button:hover {
+  background: linear-gradient(135deg, #00f2fe, #a18cd1);
 }

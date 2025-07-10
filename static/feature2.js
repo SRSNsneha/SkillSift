@@ -14,7 +14,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
     const data = await res.json();
     msg.textContent = res.ok ? `✅ ${data.message}` : `❌ ${data.error}`;
   } catch (err) {
-    msg.textContent = "❌ Error connecting to backend.";
+    msg.textContent = "❌ Error....Please Wait.";
   }
 
   form.reset();
@@ -66,7 +66,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
       resultDiv.innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
     }
   } catch (err) {
-    resultDiv.innerHTML = "<p style='color:red'>❌ Error connecting to backend.</p>";
+    resultDiv.innerHTML = "<p style='color:red'>❌Error....Please Wait.</p>";
   }
 });
 
@@ -89,6 +89,6 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
       msg.textContent = `❌ ${data.error || "Failed to clear resumes."}`;
     }
   } catch (err) {
-    msg.textContent = "❌ Error connecting to backend.";
+    msg.textContent = "❌ Error....Please Wait.";
   }
 });

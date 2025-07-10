@@ -14,7 +14,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
     const data = await res.json();
     msg.textContent = res.ok ? `✅ ${data.message}` : `❌ ${data.error}`;
   } catch (err) {
-    msg.textContent = "❌ Error connecting to backend.";
+    msg.textContent = "❌ Error....Please Wait.";
   }
 
   form.reset();
@@ -89,6 +89,6 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
       msg.textContent = `❌ ${data.error || "Failed to clear resumes."}`;
     }
   } catch (err) {
-    msg.textContent = "❌ Error connecting to backend.";
+    msg.textContent = "❌ Error....Please Wait.";
   }
 });
