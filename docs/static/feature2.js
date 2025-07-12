@@ -1,4 +1,50 @@
-// Upload Resume
+// 🔍 Check if user ID already exists
+async function checkUserIdBeforeUpload() {
+  const userIdInput = document.getElementById("name_id");
+  const userId = userIdInput.value.trim().toLowerCase();
+  const msgBox = document.getElementById("user-check-msg");
+  const newMsg = document.getElementById("new-user-msg");
+
+  msgBox.style.display = "none";
+  newMsg.style.display = "none";
+
+  const res = await fetch(`https://skillsift.onrender.com/check_user_id?user_id=${userId}`);
+  const data = await res.json();
+
+  if (data.exists) {
+    msgBox.innerHTML = `
+      🚨 <strong>This ID already exists.</strong><br><br>
+      ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
+      👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
+      ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
+      <button onclick="proceedToUploadUI()">✅ Continue Anyway</button>
+      <button onclick="resetUserId()">❌ Cancel</button>
+    `;
+    msgBox.style.display = "block";
+  } else {
+    newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
+    newMsg.style.display = "block";
+    proceedToUploadUI();
+  }
+
+  document.getElementById("hidden_user_id").value = userId;
+}
+
+function resetUserId() {
+  document.getElementById("name_id").value = "";
+  document.getElementById("user-check-msg").style.display = "none";
+  document.getElementById("new-user-msg").style.display = "none";
+}
+
+function proceedToUploadUI() {
+  const userId = document.getElementById("name_id").value.trim().toLowerCase();
+  document.getElementById("uploadForm").style.display = "block";
+  document.getElementById("hidden_user_id").value = userId;
+  document.getElementById("user-check-msg").style.display = "none";
+  document.getElementById("new-user-msg").style.display = "none";
+}
+
+// 📤 Upload Resume
 document.getElementById("uploadForm").addEventListener("submit", async function (e) {
   e.preventDefault();
   const form = e.target;
@@ -20,7 +66,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   form.reset();
 });
 
-// Analyze Resumes Against Job Description
+// 🔍 Analyze Resumes
 document.getElementById("analyzeForm").addEventListener("submit", async function (e) {
   e.preventDefault();
   const jobDesc = document.getElementById("required_skills").value.trim();
@@ -41,8 +87,6 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
       resultDiv.innerHTML = "<h3>Top 3 Matching Resumes</h3>";
       for (const r of data.results) {
         const fileName = r.file_name;
-
-        // Fetch download URL dynamically
         const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${fileName}`);
         const downloadData = await downloadRes.json();
         const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
@@ -70,7 +114,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   }
 });
 
-// Clear All Resumes for a Given User
+// 🧹 Clear All Resumes
 document.getElementById("clearBtn").addEventListener("click", async function () {
   const userId = prompt("Enter your Resume ID to clear your own uploaded resumes:");
   const msg = document.getElementById("uploadMsg");
