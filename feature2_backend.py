@@ -120,7 +120,7 @@ def store_resume():
     if not res.ok:
         return jsonify({"error": "Failed to store metadata in Supabase"}), 500
 
-    return jsonify({"message": "Resume uploaded and stored successfully!"})
+    return jsonify({"message": "Resume uploaded successfully! You can upload more resumes under this same ID to compare, or scroll down to analyze them against a job description."})
 
 @feature2_routes.route("/match_resumes", methods=["POST"])
 def match_resumes():
@@ -185,5 +185,16 @@ def clear_resumes():
                 )
 
     return jsonify({"message": f"All resumes and files cleared for ID '{name_id}'"})
+@feature2_routes.route("/check_user_id")
+def check_user_id():
+    user_id = request.args.get("user_id", "").strip().lower()
+    if not user_id:
+        return jsonify({"exists": False})
 
+    res = requests.get(
+        f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{user_id}",
+        headers=SUPABASE_HEADERS
+    )
+    exists = res.ok and len(res.json()) > 0
+    return jsonify({"exists": exists})
 

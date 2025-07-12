@@ -7,41 +7,64 @@
   <link rel="stylesheet" href="/static/feature2.css">
 </head>
 <body>
-
   <div class="container">
     <h1>Résumé Analyzer</h1>
 
-    <!-- Upload Resume -->
-    <form id="uploadForm">
+    <!-- 🔘 Toggle Instructions Button -->
+    <button onclick="toggleInstructions()" style="margin-bottom: 10px;">❓ How to Use This Feature</button>
+
+    <!-- 📘 Instruction Box (hidden by default) -->
+    <div id="instructionsBox" style="display: none; background: #fffbe6; color: #333; padding: 10px; border-left: 4px solid orange; margin-bottom: 20px;">
+      <p><strong>📘 Instructions:</strong></p>
+      <ul>
+        <li>Enter a unique <strong>Resume ID</strong> to group your uploads.</li>
+        <li>Upload one or more resumes (PDF only) under this ID.</li>
+        <li>Scroll down, enter your <strong>Resume ID</strong>, and then paste the <strong>job description</strong> to analyze your uploaded resumes.</li>
+        <li>If you want to compare a totally new set of resumes:
+          <ul>
+            <li>Use the same Resume ID and click the <strong>"🧹 Clear All Resumes"</strong> button.</li>
+            <li>This will delete the old resumes under that ID and let you start fresh.</li>
+          </ul>
+        </li>
+        <li>You can re-use the same ID again after clearing to compare new resumes.</li>
+      </ul>
+    </div>
+
+    <!-- 🔍 ID Check Section -->
+    <input  type="text" id="name_id" name="name_id" placeholder="Enter Resume ID" required>
+    <button onclick="checkUserIdBeforeUpload()">Next</button>
+    <div id="user-check-msg" style="display: none; color: red; margin-top: 10px;"></div>
+    <div id="new-user-msg" style="display: none; color: green; margin-top: 10px;"></div>
+
+    <!-- 📤 Upload Form -->
+    <form id="uploadForm" style="display: none;">
       <label for="file">Upload Resume (PDF):</label>
       <input type="file" name="file" id="file" required>
-      <input type="text" name="name_id" placeholder="Enter Resume ID" required>
+      <input type="hidden" name="name_id" id="hidden_user_id">
       <button type="submit">Upload</button>
       <p id="uploadMsg" class="status"></p>
     </form>
 
-    <!-- Disclaimer -->
-    <p style="color: red; font-weight: bold;">
-      ⚠️ Disclaimer: Please use a unique Resume ID and click "🧹 Clear All Resumes" if you want to upload and compare a new set of resumes.
-    </p>
-  
+    <!-- 🧠 Analyze Section -->
+    <form id="analyzeForm">
+      <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required>
+      <textarea id="required_skills" rows="6" placeholder="Paste job description here..." required></textarea>
+      <button type="submit">Analyze</button>
+    </form>
 
-
-    <!-- Analyze Section -->
-<form id="analyzeForm">
-  <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required>
-  <textarea id="required_skills" rows="6" placeholder="Paste job description here..." required></textarea>
-  <button type="submit">Analyze</button>
-</form>
-
-
-    <!-- Results Display -->
+    <!-- 📊 Results -->
     <div id="results"></div>
 
-    <!-- Clear Button -->
+    <!-- 🧹 Clear Button -->
     <button id="clearBtn">🧹 Clear All Resumes</button>
   </div>
 
+  <script>
+    function toggleInstructions() {
+      const box = document.getElementById("instructionsBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+  </script>
   <script src="/static/feature2.js"></script>
 </body>
 </html>
