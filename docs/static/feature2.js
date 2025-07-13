@@ -1,16 +1,9 @@
-const baseURL = "https://skillsift.onrender.com"; 
 // 🔍 Check if user ID already exists
-async function checkUserIdBeforeUpload(event) {
+async function checkUserIdBeforeUpload() {
   const userIdInput = document.getElementById("name_id");
   const userId = userIdInput.value.trim().toLowerCase();
   const msgBox = document.getElementById("user-check-msg");
   const newMsg = document.getElementById("new-user-msg");
-
-  const nextButton = event?.target;
-  if (nextButton) {
-    nextButton.disabled = true;
-    nextButton.textContent = "Checking...";
-  }
 
   msgBox.style.display = "block";
   msgBox.style.color = "blue";
@@ -18,11 +11,10 @@ async function checkUserIdBeforeUpload(event) {
   newMsg.style.display = "none";
 
   try {
-    const res = await fetch(`${baseURL}/check_user_id?user_id=${userId}`);
+    const res = await fetch(`https://skillsift.onrender.com/check_user_id?user_id=${userId}`);
     const data = await res.json();
 
     if (data.exists) {
-      msgBox.style.color = "red";
       msgBox.innerHTML = `
         🚨 <strong>This ID already exists.</strong><br><br>
         ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
@@ -31,6 +23,7 @@ async function checkUserIdBeforeUpload(event) {
         <button onclick="proceedToUploadUI()">Continue Anyway</button>
         <button onclick="resetUserId()">Cancel</button>
       `;
+      msgBox.style.color = "red";
     } else {
       msgBox.style.display = "none";
       newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
@@ -43,11 +36,6 @@ async function checkUserIdBeforeUpload(event) {
     msgBox.style.color = "red";
     msgBox.innerHTML = "❌ Error checking ID. Please try again.";
     console.error(err);
-  }
-
-  if (nextButton) {
-    nextButton.disabled = false;
-    nextButton.textContent = "Next";
   }
 }
 
@@ -74,7 +62,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   msg.textContent = "📤 Uploading...";
 
   try {
-    const res = await fetch(`${baseURL}/store_resume`, {
+    const res = await fetch("https://skillsift.onrender.com/store_resume", {
       method: "POST",
       body: formData,
     });
@@ -96,7 +84,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   resultDiv.innerHTML = "<p>🔎 Analyzing...</p>";
 
   try {
-    const res = await fetch(`${baseURL}/match_resumes`, {
+    const res = await fetch("https://skillsift.onrender.com/match_resumes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ job_description: jobDesc, name_id: userId }),
@@ -107,7 +95,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
     if (res.ok) {
       resultDiv.innerHTML = "<h3>Top 3 Matching Resumes</h3>";
       for (const r of data.results) {
-        const downloadRes = await fetch(`${baseURL}/download_resume/${userId}/${r.file_name}`);
+        const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${r.file_name}`);
         const downloadData = await downloadRes.json();
         const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
 
@@ -141,7 +129,7 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
   msg.textContent = "🧹 Clearing resumes...";
 
   try {
-    const res = await fetch(`${baseURL}/clear_resumes?name_id=${userId}`, {
+    const res = await fetch(`https://skillsift.onrender.com/clear_resumes?name_id=${userId}`, {
       method: "DELETE",
     });
     const data = await res.json();
