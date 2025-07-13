@@ -1,6 +1,10 @@
 document.getElementById("upload-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
+  const resultSection = document.getElementById("result");
+  resultSection.classList.remove("hidden");
+  resultSection.innerHTML = "<p>🔍 Analyzing resume... Please wait.</p>";
+
   const fileInput = document.getElementById("resume");
   const formData = new FormData();
   const jobDescription = document.getElementById("job-description").value;
@@ -15,45 +19,23 @@ document.getElementById("upload-form").addEventListener("submit", async function
 
     const data = await response.json();
 
-    // Show result section
-    document.getElementById("result").classList.remove("hidden");
-
-    // Fill in the fields
-    document.getElementById("email").innerText = data.email;
-    document.getElementById("phone").innerText = data.phone;
-
-    // Education
-    const eduList = document.getElementById("education");
-    eduList.innerHTML = "";
-    data.education.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      eduList.appendChild(li);
-    });
-
-    // Skill match percentage
-    document.getElementById("match-percentage").innerText = `Skill Match: ${data.skill_match_percentage}%`;
-
-    // Matched Skills
-    const matchedList = document.getElementById("matched-skills");
-    matchedList.innerHTML = "";
-    data.matched_skills.forEach(skill => {
-      const li = document.createElement("li");
-      li.textContent = skill;
-      matchedList.appendChild(li);
-    });
-
-    // Missing skills
-    const missingSkillsList = document.getElementById("missing-skills");
-    missingSkillsList.innerHTML = "";
-    data.missing_skills.forEach(skill => {
-      const li = document.createElement("li");
-      li.textContent = skill;
-      missingSkillsList.appendChild(li);
-    });
+    // Build the result content
+    let resultHTML = `
+      <h2>Extracted Information</h2>
+      <p><strong>Email:</strong> <span id="email">${data.email}</span></p>
+      <p><strong>Phone:</strong> <span id="phone">${data.phone}</span></p>
+      <h3>Education:</h3>
+      <ul id="education">${data.education.map(item => `<li>${item}</li>`).join("")}</ul>
+      <h3 id="match-percentage">Skill Match: ${data.skill_match_percentage}%</h3>
+      <h3>Matched Skills:</h3>
+      <ul id="matched-skills">${data.matched_skills.map(skill => `<li>${skill}</li>`).join("")}</ul>
+      <h3>Missing Skills:</h3>
+      <ul id="missing-skills">${data.missing_skills.map(skill => `<li>${skill}</li>`).join("")}</ul>
+    `;
+    resultSection.innerHTML = resultHTML;
 
   } catch (err) {
-    alert("Error analyzing resume.Please wait and try again.");
+    resultSection.innerHTML = "<p style='color:red'>❌ Error analyzing resume. Please try again.</p>";
     console.error(err);
   }
 });

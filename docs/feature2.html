@@ -4,40 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Resume Analyzer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="./static/feature2.css">
 </head>
 <body>
   <div class="container">
     <h1>Résumé Analyzer</h1>
 
-    <!-- 🔘 Toggle Instructions Button -->
+    <!-- Toggle Instructions Button -->
     <button onclick="toggleInstructions()" style="margin-bottom: 10px;">❓ How to Use This Feature</button>
 
-    <!-- 📘 Instruction Box -->
+    <!-- Instruction Box -->
     <div id="instructionsBox" style="display: none; background: #fffbe6; color: #333; padding: 10px; border-left: 4px solid orange; margin-bottom: 20px;">
       <p><strong>📘 Instructions:</strong></p>
       <ul>
-        <li>Enter a unique <strong>Resume ID</strong> to group your uploads.</li>
-        <li>Upload one or more resumes (PDF only) under this ID.</li>
-        <li>Scroll down, enter your <strong>Resume ID</strong>, and paste the <strong>job description</strong> to analyze resumes.</li>
-        <li>If you want to compare a new set of resumes:
+        <li> Under the <strong>“Upload Resumes”</strong> section:
           <ul>
-            <li>Use the same Resume ID and click the <strong>"🧹 Clear All Resumes"</strong> button.</li>
-            <li>This clears old resumes under that ID, so you can upload new ones.</li>
+            <li>Enter a unique <strong>Resume ID</strong> (e.g.,xyz_amazon).</li>
+            <li>Upload one or more PDF resumes under this ID.</li>
           </ul>
         </li>
-        <li>You can reuse the same ID after clearing the old data.</li>
+        <li> Under the <strong>“Analyze Resumes”</strong> section:
+          <ul>
+            <li>Enter the same Resume ID you used earlier.</li>
+            <li>Paste the job description and click Analyze.</li>
+          </ul>
+        </li>
+        <li> Want to start over with new resumes?
+          <ul>
+            <li>Use the same Resume ID and click <strong>"🧹 Clear All Resumes"</strong> to remove the old ones.</li>
+            <li>You can then re-upload under the same ID for a fresh comparison.</li>
+          </ul>
+        </li>
       </ul>
     </div>
 
-    <!-- 🔍 Resume ID Input -->
+    <!-- Upload Section -->
+    <h2><i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Upload Resumes</h2>
     <input type="text" id="name_id" name="name_id" placeholder="Enter Resume ID" required>
     <button onclick="checkUserIdBeforeUpload()">Next</button>
     <div id="user-check-msg" style="display: none; color: red; margin-top: 10px;"></div>
     <div id="new-user-msg" style="display: none; color: green; margin-top: 10px;"></div>
 
-    <!-- 📤 Upload Form -->
-    <form id="uploadForm" style="display: none;">
+    <form id="uploadForm" style="display: none; margin-top: 15px;">
       <label for="file">Upload Resume (PDF):</label>
       <input type="file" name="file" id="file" required>
       <input type="hidden" name="name_id" id="hidden_user_id">
@@ -45,21 +54,21 @@
       <p id="uploadMsg" class="status"></p>
     </form>
 
-    <!-- 🧠 Analyze Section -->
+    <!--  Analyze Section -->
+    <h2><i class="fa-brands fa-searchengin fa-bounce"></i> Analyze Resumes</h2>
     <form id="analyzeForm">
       <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required>
       <textarea id="required_skills" rows="6" placeholder="Paste job description here..." required></textarea>
       <button type="submit">Analyze</button>
     </form>
 
-    <!-- 📊 Results Display -->
+    <!--  Results -->
     <div id="results"></div>
 
-    <!-- 🧹 Clear Button -->
+    <!-- Clear Button -->
     <button id="clearBtn">🧹 Clear All Resumes</button>
   </div>
 
-  <!-- 🔧 Scripts -->
   <script>
     function toggleInstructions() {
       const box = document.getElementById("instructionsBox");

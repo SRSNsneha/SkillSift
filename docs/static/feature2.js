@@ -1,33 +1,50 @@
 // 🔍 Check if user ID already exists
-async function checkUserIdBeforeUpload() {
+async function checkUserIdBeforeUpload(event) {
   const userIdInput = document.getElementById("name_id");
   const userId = userIdInput.value.trim().toLowerCase();
   const msgBox = document.getElementById("user-check-msg");
   const newMsg = document.getElementById("new-user-msg");
 
+  const nextButton = event?.target;
+  if (nextButton) {
+    nextButton.disabled = true;
+    nextButton.textContent = "Checking...";
+  }
+
   msgBox.style.display = "none";
   newMsg.style.display = "none";
 
-  const res = await fetch(`https://skillsift.onrender.com/check_user_id?user_id=${userId}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`https://skillsift.onrender.com/check_user_id?user_id=${userId}`);
+    const data = await res.json();
 
-  if (data.exists) {
-    msgBox.innerHTML = `
-      🚨 <strong>This ID already exists.</strong><br><br>
-      ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
-      👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
-      ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
-      <button onclick="proceedToUploadUI()">✅ Continue Anyway</button>
-      <button onclick="resetUserId()">❌ Cancel</button>
-    `;
+    if (data.exists) {
+      msgBox.innerHTML = `
+        🚨 <strong>This ID already exists.</strong><br><br>
+        ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
+        👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
+        ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
+        <button onclick="proceedToUploadUI()">Continue Anyway</button>
+        <button onclick="resetUserId()">Cancel</button>
+      `;
+      msgBox.style.display = "block";
+    } else {
+      newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
+      newMsg.style.display = "block";
+      proceedToUploadUI();
+    }
+
+    document.getElementById("hidden_user_id").value = userId;
+  } catch (err) {
+    msgBox.textContent = "❌ Error checking ID. Please try again.";
     msgBox.style.display = "block";
-  } else {
-    newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
-    newMsg.style.display = "block";
-    proceedToUploadUI();
+    console.error(err);
   }
 
-  document.getElementById("hidden_user_id").value = userId;
+  if (nextButton) {
+    nextButton.disabled = false;
+    nextButton.textContent = "Next";
+  }
 }
 
 function resetUserId() {
@@ -50,7 +67,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   const form = e.target;
   const formData = new FormData(form);
   const msg = document.getElementById("uploadMsg");
-  msg.textContent = "Uploading...";
+  msg.textContent = "📤 Uploading...";
 
   try {
     const res = await fetch("https://skillsift.onrender.com/store_resume", {
@@ -72,7 +89,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   const jobDesc = document.getElementById("required_skills").value.trim();
   const userId = document.getElementById("analyze_user_id").value.trim();
   const resultDiv = document.getElementById("results");
-  resultDiv.innerHTML = "<p>Analyzing...</p>";
+  resultDiv.innerHTML = "<p>🔎 Analyzing...</p>";
 
   try {
     const res = await fetch("https://skillsift.onrender.com/match_resumes", {
@@ -86,8 +103,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
     if (res.ok) {
       resultDiv.innerHTML = "<h3>Top 3 Matching Resumes</h3>";
       for (const r of data.results) {
-        const fileName = r.file_name;
-        const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${fileName}`);
+        const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${r.file_name}`);
         const downloadData = await downloadRes.json();
         const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
 
@@ -118,7 +134,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
 document.getElementById("clearBtn").addEventListener("click", async function () {
   const userId = prompt("Enter your Resume ID to clear your own uploaded resumes:");
   const msg = document.getElementById("uploadMsg");
-  msg.textContent = "Clearing resumes...";
+  msg.textContent = "🧹 Clearing resumes...";
 
   try {
     const res = await fetch(`https://skillsift.onrender.com/clear_resumes?name_id=${userId}`, {

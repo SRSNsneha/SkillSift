@@ -5,29 +5,40 @@ async function checkUserIdBeforeUpload() {
   const msgBox = document.getElementById("user-check-msg");
   const newMsg = document.getElementById("new-user-msg");
 
-  msgBox.style.display = "none";
+  // Reset display states
+  msgBox.style.display = "block";
+  msgBox.style.color = "blue";
+  msgBox.innerHTML = "🔄 Checking ID...";
   newMsg.style.display = "none";
 
-  const res = await fetch(`http://127.0.0.1:5000/check_user_id?user_id=${userId}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`http://127.0.0.1:5000/check_user_id?user_id=${userId}`);
+    const data = await res.json();
 
-  if (data.exists) {
-  msgBox.innerHTML = `
-  🚨 <strong>This ID already exists.</strong><br><br>
-  ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
-  👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
-  ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
-  <button onclick="proceedToUploadUI()">Continue Anyway</button>
-  <button onclick="resetUserId()"> Cancel</button>
-`;
-  msgBox.style.display = "block";s
-} else {
-    newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
-    newMsg.style.display = "block";
-    proceedToUploadUI();
+    if (data.exists) {
+      msgBox.innerHTML = `
+        🚨 <strong>This ID already exists.</strong><br><br>
+        ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
+        👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
+        ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
+        <button onclick="proceedToUploadUI()">Continue Anyway</button>
+        <button onclick="resetUserId()">Cancel</button>
+      `;
+      msgBox.style.color = "red";
+    } else {
+      msgBox.style.display = "none";
+      newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
+      newMsg.style.display = "block";
+      proceedToUploadUI();
+    }
+
+    document.getElementById("hidden_user_id").value = userId;
+
+  } catch (err) {
+    msgBox.style.color = "red";
+    msgBox.innerHTML = "❌ Error checking ID. Please try again.";
+    console.error(err);
   }
-
-  document.getElementById("hidden_user_id").value = userId;
 }
 
 function resetUserId() {
@@ -50,7 +61,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   const form = e.target;
   const formData = new FormData(form);
   const msg = document.getElementById("uploadMsg");
-  msg.textContent = "Uploading...";
+  msg.textContent = "📤 Uploading...";
 
   try {
     const res = await fetch("http://127.0.0.1:5000/store_resume", {
@@ -60,7 +71,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
     const data = await res.json();
     msg.textContent = res.ok ? `✅ ${data.message}` : `❌ ${data.error}`;
   } catch (err) {
-    msg.textContent = "❌ Error....Please Wait.";
+    msg.textContent = "❌ Upload failed. Please try again.";
   }
 
   form.reset();
@@ -72,7 +83,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   const jobDesc = document.getElementById("required_skills").value.trim();
   const userId = document.getElementById("analyze_user_id").value.trim();
   const resultDiv = document.getElementById("results");
-  resultDiv.innerHTML = "<p>Analyzing...</p>";
+  resultDiv.innerHTML = "<p>🔎 Analyzing...</p>";
 
   try {
     const res = await fetch("http://127.0.0.1:5000/match_resumes", {
@@ -109,7 +120,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
       resultDiv.innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
     }
   } catch (err) {
-    resultDiv.innerHTML = "<p style='color:red'>❌ Error....Please Wait.</p>";
+    resultDiv.innerHTML = "<p style='color:red'>❌ Analysis failed. Please try again.</p>";
   }
 });
 
@@ -117,7 +128,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
 document.getElementById("clearBtn").addEventListener("click", async function () {
   const userId = prompt("Enter your Resume ID to clear your own uploaded resumes:");
   const msg = document.getElementById("uploadMsg");
-  msg.textContent = "Clearing resumes...";
+  msg.textContent = "🧹 Clearing resumes...";
 
   try {
     const res = await fetch(`http://127.0.0.1:5000/clear_resumes?name_id=${userId}`, {
@@ -135,4 +146,3 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
     msg.textContent = "❌ Error....Please Wait.";
   }
 });
-
