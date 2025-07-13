@@ -92,7 +92,7 @@ def store_resume():
         print("Upload Response:", upload_res.text)
 
     if not upload_res.ok:
-        return jsonify({"error": "Failed to upload to Supabase Storage"}), 500
+        return jsonify({"error": "Failed to upload to store the file"}), 500
 
     # Generate public file URL
     file_url = f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_BUCKET}/{name_id}/{filename}"
