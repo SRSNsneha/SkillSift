@@ -1,3 +1,4 @@
+const baseURL = "https://skillsift.onrender.com"; 
 // 🔍 Check if user ID already exists
 async function checkUserIdBeforeUpload(event) {
   const userIdInput = document.getElementById("name_id");
@@ -11,14 +12,17 @@ async function checkUserIdBeforeUpload(event) {
     nextButton.textContent = "Checking...";
   }
 
-  msgBox.style.display = "none";
+  msgBox.style.display = "block";
+  msgBox.style.color = "blue";
+  msgBox.innerHTML = "🔄 Checking ID...";
   newMsg.style.display = "none";
 
   try {
-    const res = await fetch(`https://skillsift.onrender.com/check_user_id?user_id=${userId}`);
+    const res = await fetch(`${baseURL}/check_user_id?user_id=${userId}`);
     const data = await res.json();
 
     if (data.exists) {
+      msgBox.style.color = "red";
       msgBox.innerHTML = `
         🚨 <strong>This ID already exists.</strong><br><br>
         ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
@@ -27,8 +31,8 @@ async function checkUserIdBeforeUpload(event) {
         <button onclick="proceedToUploadUI()">Continue Anyway</button>
         <button onclick="resetUserId()">Cancel</button>
       `;
-      msgBox.style.display = "block";
     } else {
+      msgBox.style.display = "none";
       newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
       newMsg.style.display = "block";
       proceedToUploadUI();
@@ -36,8 +40,8 @@ async function checkUserIdBeforeUpload(event) {
 
     document.getElementById("hidden_user_id").value = userId;
   } catch (err) {
-    msgBox.textContent = "❌ Error checking ID. Please try again.";
-    msgBox.style.display = "block";
+    msgBox.style.color = "red";
+    msgBox.innerHTML = "❌ Error checking ID. Please try again.";
     console.error(err);
   }
 
@@ -70,14 +74,14 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   msg.textContent = "📤 Uploading...";
 
   try {
-    const res = await fetch("https://skillsift.onrender.com/store_resume", {
+    const res = await fetch(`${baseURL}/store_resume`, {
       method: "POST",
       body: formData,
     });
     const data = await res.json();
     msg.textContent = res.ok ? `✅ ${data.message}` : `❌ ${data.error}`;
   } catch (err) {
-    msg.textContent = "❌ Error....Please Wait.";
+    msg.textContent = "❌ Upload failed. Please try again.";
   }
 
   form.reset();
@@ -92,7 +96,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
   resultDiv.innerHTML = "<p>🔎 Analyzing...</p>";
 
   try {
-    const res = await fetch("https://skillsift.onrender.com/match_resumes", {
+    const res = await fetch(`${baseURL}/match_resumes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ job_description: jobDesc, name_id: userId }),
@@ -103,7 +107,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
     if (res.ok) {
       resultDiv.innerHTML = "<h3>Top 3 Matching Resumes</h3>";
       for (const r of data.results) {
-        const downloadRes = await fetch(`https://skillsift.onrender.com/download_resume/${userId}/${r.file_name}`);
+        const downloadRes = await fetch(`${baseURL}/download_resume/${userId}/${r.file_name}`);
         const downloadData = await downloadRes.json();
         const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
 
@@ -126,7 +130,7 @@ document.getElementById("analyzeForm").addEventListener("submit", async function
       resultDiv.innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
     }
   } catch (err) {
-    resultDiv.innerHTML = "<p style='color:red'>❌ Error connecting...Please Wait.</p>";
+    resultDiv.innerHTML = "<p style='color:red'>❌ Analysis failed. Please try again.</p>";
   }
 });
 
@@ -137,7 +141,7 @@ document.getElementById("clearBtn").addEventListener("click", async function () 
   msg.textContent = "🧹 Clearing resumes...";
 
   try {
-    const res = await fetch(`https://skillsift.onrender.com/clear_resumes?name_id=${userId}`, {
+    const res = await fetch(`${baseURL}/clear_resumes?name_id=${userId}`, {
       method: "DELETE",
     });
     const data = await res.json();
