@@ -9,6 +9,7 @@ from spacy.matcher import PhraseMatcher
 import os, re, requests
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from supabase import create_client, Client 
 load_dotenv()
 
 
@@ -28,6 +29,7 @@ SUPABASE_HEADERS = {
     "Authorization": f"Bearer {SUPABASE_API_KEY}",
     "Content-Type": "application/json"
 }
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY) 
 
 # Azure setup
 AZURE_FORM_RECOGNIZER_ENDPOINT = os.getenv("AZURE_ENDPOINT")
@@ -65,13 +67,18 @@ def extract_skills(text):
 
 @feature2_routes.route("/store_resume", methods=["POST"])
 def store_resume():
-    if "file" not in request.files:
+    if "resume" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
-    file = request.files["file"]
+    file = request.files["resume"]
     name_id = request.form.get("name_id", "").strip().lower()
     if not name_id or not file.filename:
         return jsonify({"error": "Missing name_id or file"}), 400
+    
+    pin = request.form.get("pin", "").strip()
+    if not pin or len(pin) != 4 or not pin.isdigit():
+        return jsonify({"error": "PIN must be a 4-digit number"}), 400
+
 
     filename = secure_filename(file.filename)
     local_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -112,7 +119,8 @@ def store_resume():
         "file_name": filename,
         "file_url": file_url,
         "content": text,
-        "skills": skills
+        "skills": skills,
+        "pin": pin 
     }
 
     # Insert metadata into Supabase Table
@@ -127,26 +135,53 @@ def match_resumes():
     data = request.get_json()
     name_id = data.get("name_id", "").strip().lower()
     jd = data.get("job_description", "").strip()
+
     if not name_id or not jd:
         return jsonify({"error": "Missing name_id or job description"}), 400
 
+    # Fetch resumes for the user
     res = requests.get(f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{name_id}", headers=SUPABASE_HEADERS)
     if not res.ok or not res.json():
         return jsonify({"error": f"No resumes found for ID '{name_id}'"}), 404
 
     resumes = res.json()
-    documents = [jd] + [r["content"] for r in resumes]
+    if not resumes:
+        return jsonify({"error": "No resumes found."}), 404
+
+    # Build the documents list: JD + resume contents
+    documents = [jd]
+    valid_resumes = []
+
+    for r in resumes:
+        content = r.get("content", "")
+        if content:
+            documents.append(content)
+            valid_resumes.append(r)
+
+    if len(documents) <= 1:
+        return jsonify({"error": "No valid resume content to match."}), 400
+
+    # TF-IDF + Similarity
     tfidf = TfidfVectorizer(stop_words="english").fit_transform(documents)
     scores = cosine_similarity(tfidf[0:1], tfidf[1:]).flatten()
     jd_skills = extract_skills(jd)
 
+    # Annotate resumes
     for i, score in enumerate(scores):
-        resumes[i]["match_percent"] = round(score * 100, 2)
-        resumes[i]["matched_skills"] = list(set(resumes[i]["skills"]) & set(jd_skills))
-        resumes[i]["missing_skills"] = list(set(jd_skills) - set(resumes[i]["skills"]))
+        resume = valid_resumes[i]
+        resume_skills = resume.get("skills") or []
+        if not isinstance(resume_skills, list):
+            resume_skills = []
 
-    resumes.sort(key=lambda r: r["match_percent"], reverse=True)
-    return jsonify({"results": resumes[:3]})
+        resume["match_percent"] = round(score * 100, 2)
+        resume["matched_skills"] = list(set(resume_skills) & set(jd_skills))
+        resume["missing_skills"] = list(set(jd_skills) - set(resume_skills))
+
+    # Sort and return top 3
+    valid_resumes.sort(key=lambda r: r["match_percent"], reverse=True)
+    return jsonify({"results": valid_resumes[:3]})
+
+
 
 @feature2_routes.route("/download_resume/<name_id>/<filename>")
 def download_resume(name_id, filename):
@@ -158,33 +193,31 @@ def download_resume(name_id, filename):
 @feature2_routes.route("/clear_resumes", methods=["DELETE"])
 def clear_resumes():
     name_id = request.args.get("name_id", "").strip().lower()
-    if not name_id:
-        return jsonify({"error": "Missing name_id"}), 400
+    pin = request.args.get("pin", "").strip()
 
-    # --- 1. Delete metadata from table ---
-    delete_meta = requests.delete(
-        f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{name_id}",
-        headers={**SUPABASE_HEADERS, "Prefer": "return=representation"}
+    if not name_id or not pin:
+        return jsonify({"error": "Missing name_id or pin"}), 400
+
+    delete_res = requests.delete(
+        f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{name_id}&pin=eq.{pin}",
+        headers={**SUPABASE_HEADERS, "Prefer": "return=representation"},
     )
 
-    # --- 2. List files in storage ---
-    list_files = requests.get(
-        f"{SUPABASE_URL}/storage/v1/object/list/{SUPABASE_BUCKET}?prefix={name_id}/",
-        headers=SUPABASE_HEADERS
-    )
+    if not delete_res.ok:
+        return jsonify({"error": "Failed to delete resumes"}), 500
 
-    if list_files.ok:
-        files = list_files.json()
-        for item in files:
-            file_name = item.get("name")
-            if file_name:
-                # Delete each file
-                requests.delete(
-                    f"{SUPABASE_URL}/storage/v1/object/{SUPABASE_BUCKET}/{name_id}/{file_name}",
-                    headers=SUPABASE_HEADERS
-                )
+    try:
+        deleted = delete_res.json()
+    except ValueError:
+        deleted = []
 
-    return jsonify({"message": f"All resumes and files cleared for ID '{name_id}'"})
+    if not deleted:
+        return jsonify({"error": "No resumes deleted — possibly incorrect PIN or ID"}), 403
+
+    return jsonify({"message": f"{len(deleted)} resume(s) deleted successfully."})
+
+
+
 @feature2_routes.route("/check_user_id")
 def check_user_id():
     user_id = request.args.get("user_id", "").strip().lower()
@@ -197,4 +230,62 @@ def check_user_id():
     )
     exists = res.ok and len(res.json()) > 0
     return jsonify({"exists": exists})
+
+@feature2_routes.route("/store_user_pin", methods=["POST"])
+def store_user_pin():
+    data = request.get_json()
+    name_id = data.get("name_id", "").strip().lower()
+    pin = data.get("pin", "").strip()
+
+    if not name_id or not pin or len(pin) != 4 or not pin.isdigit():
+        return jsonify({"success": False, "error": "Invalid name_id or PIN"}), 400
+
+    # Try update first
+    update_res = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{name_id}",
+        headers={**SUPABASE_HEADERS, "Prefer": "return=representation"},
+        json={"pin": pin}
+    )
+
+    if update_res.ok and len(update_res.json()) > 0:
+        return jsonify({"success": True, "message": "PIN updated successfully"})
+
+    # Insert new record if update didn't find existing
+    insert_res = requests.post(
+        f"{SUPABASE_URL}/rest/v1/resumes",
+        headers=SUPABASE_HEADERS,
+        json={"name_id": name_id, "pin": pin}
+    )
+
+    if insert_res.ok:
+        return jsonify({"success": True, "message": "PIN set successfully for new user"})
+    else:
+        return jsonify({"success": False, "error": "Failed to create user with PIN"}), 400
+
+@feature2_routes.route("/verify_pin", methods=["GET"])
+def verify_pin():
+    name_id = request.args.get("name_id", "").strip().lower()
+    pin = request.args.get("pin", "").strip()
+
+    if not name_id or not pin or len(pin) != 4 or not pin.isdigit():
+        return jsonify({"valid": False, "error": "Invalid input"}), 400
+
+    res = requests.get(
+        f"{SUPABASE_URL}/rest/v1/resumes?name_id=eq.{name_id}&select=pin",
+        headers=SUPABASE_HEADERS
+    )
+
+    if not res.ok:
+        return jsonify({"valid": False, "error": "Database error"}), 500
+
+    data = res.json()
+    if not data:
+        return jsonify({"valid": False, "error": "User ID not found"}), 404
+
+    stored_pin = data[0].get("pin")
+    if stored_pin == pin:
+        return jsonify({"valid": True})
+    else:
+        return jsonify({"valid": False})
+
 

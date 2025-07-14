@@ -1,148 +1,262 @@
-// 🔍 Check if user ID already exists
+// feature2.js — Cleaned and Working JavaScript for Resume Analyzer
+
+// Helper to show messages nicely
+function showMessage(elem, text, color = "black", display = "block") {
+  elem.innerHTML = text;
+  elem.style.color = color;
+  elem.style.display = display;
+}
+
+function toggleInstructions() {
+  const box = document.getElementById("instructionsBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+// Check user ID before upload (on "Next")
 async function checkUserIdBeforeUpload() {
-  const userIdInput = document.getElementById("name_id");
-  const userId = userIdInput.value.trim().toLowerCase();
+  const name_id = document.getElementById("name_id").value.trim().toLowerCase();
+  const pinContainer = document.getElementById("pin-container");
+  const pinLabel = document.getElementById("pin-label");
   const msgBox = document.getElementById("user-check-msg");
   const newMsg = document.getElementById("new-user-msg");
+  const pinInput = document.getElementById("pin");
 
-  // Reset display states
-  msgBox.style.display = "block";
-  msgBox.style.color = "blue";
-  msgBox.innerHTML = "🔄 Checking ID...";
+  if (!name_id) {
+    showMessage(msgBox, "❌ Please enter a Resume ID.", "red");
+    pinContainer.style.display = "none";
+    newMsg.style.display = "none";
+    return;
+  }
+
+  showMessage(msgBox, "🔄 Checking ID...", "blue");
   newMsg.style.display = "none";
+  pinContainer.style.display = "none";
+  pinInput.value = "";
+  ["checkPinBtn", "setPinBtn"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.remove();
+  });
 
   try {
-    const res = await fetch(`http://127.0.0.1:5000/check_user_id?user_id=${userId}`);
+    const res = await fetch(`/check_user_id?user_id=${encodeURIComponent(name_id)}`);
     const data = await res.json();
 
+    pinContainer.style.display = "block";
+
     if (data.exists) {
-      msgBox.innerHTML = `
-        🚨 <strong>This ID already exists.</strong><br><br>
-        ⚠️ If you're unsure whether this ID is yours, it's safer to use a new one.<br>
-        👉 Alternatively, you can clear all existing resumes under this ID using the <strong>"🧹 Clear All Resumes"</strong> button and then reuse it for a fresh comparison.<br>
-        ✅ Otherwise, if you're confident this is your ID, you can simply continue below.<br><br>
-        <button onclick="proceedToUploadUI()">Continue Anyway</button>
-        <button onclick="resetUserId()">Cancel</button>
-      `;
-      msgBox.style.color = "red";
+      pinLabel.textContent = "Enter your 4-digit PIN:";
+      showMessage(msgBox, "🔐 Existing ID. Please verify PIN.", "red");
+
+      const checkBtn = document.createElement("button");
+      checkBtn.id = "checkPinBtn";
+      checkBtn.textContent = "Verify PIN & Continue";
+      checkBtn.type = "button";
+      checkBtn.onclick = submitExistingUser;
+      pinContainer.appendChild(checkBtn);
     } else {
-      msgBox.style.display = "none";
-      newMsg.textContent = "✅ New ID registered successfully. You can now upload your resumes!";
-      newMsg.style.display = "block";
-      proceedToUploadUI();
+      pinLabel.textContent = "Set your 4-digit PIN:";
+      showMessage(newMsg, "✅ New ID. Set a PIN to continue.", "green");
+
+      const setBtn = document.createElement("button");
+      setBtn.id = "setPinBtn";
+      setBtn.textContent = "Set PIN & Continue";
+      setBtn.type = "button";
+      setBtn.onclick = submitNewUser;
+      pinContainer.appendChild(setBtn);
     }
-
-    document.getElementById("hidden_user_id").value = userId;
-
   } catch (err) {
-    msgBox.style.color = "red";
-    msgBox.innerHTML = "❌ Error checking ID. Please try again.";
+    showMessage(msgBox, "❌ Error checking ID.", "red");
     console.error(err);
   }
 }
 
-function resetUserId() {
-  document.getElementById("name_id").value = "";
-  document.getElementById("user-check-msg").style.display = "none";
-  document.getElementById("new-user-msg").style.display = "none";
-}
+async function submitExistingUser() {
+  const name_id = document.getElementById("name_id").value.trim().toLowerCase();
+  const pin = document.getElementById("pin").value.trim();
+  const msgBox = document.getElementById("user-check-msg");
+  const form = document.getElementById("uploadForm");
 
-function proceedToUploadUI() {
-  const userId = document.getElementById("name_id").value.trim().toLowerCase();
-  document.getElementById("uploadForm").style.display = "block";
-  document.getElementById("hidden_user_id").value = userId;
-  document.getElementById("user-check-msg").style.display = "none";
-  document.getElementById("new-user-msg").style.display = "none";
-}
-
-// 📤 Upload Resume
-document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
-  const msg = document.getElementById("uploadMsg");
-  msg.textContent = "📤 Uploading...";
-
-  try {
-    const res = await fetch("http://127.0.0.1:5000/store_resume", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    msg.textContent = res.ok ? `✅ ${data.message}` : `❌ ${data.error}`;
-  } catch (err) {
-    msg.textContent = "❌ Upload failed. Please try again.";
+  if (pin.length !== 4 || isNaN(pin)) {
+    showMessage(msgBox, "❌ Please enter a valid 4-digit PIN.", "red");
+    return;
   }
 
-  form.reset();
-});
+  try {
+    const res = await fetch(`/verify_pin?name_id=${encodeURIComponent(name_id)}&pin=${encodeURIComponent(pin)}`);
+    const data = await res.json();
 
-// 🔍 Analyze Resumes
-document.getElementById("analyzeForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const jobDesc = document.getElementById("required_skills").value.trim();
-  const userId = document.getElementById("analyze_user_id").value.trim();
-  const resultDiv = document.getElementById("results");
-  resultDiv.innerHTML = "<p>🔎 Analyzing...</p>";
+    if (data.valid) {
+      showMessage(msgBox, "✅ PIN verified. You may now upload resumes.", "green");
+      form.style.display = "block";
+      document.getElementById("hidden_user_id").value = name_id;
+      document.getElementById("hidden_user_pin").value = pin;
+    } else {
+      showMessage(msgBox, "❌ Incorrect PIN.", "red");
+      form.style.display = "none";
+    }
+  } catch (err) {
+    showMessage(msgBox, "❌ Error verifying PIN.", "red");
+    console.error(err);
+  }
+}
+
+async function submitNewUser() {
+  const name_id = document.getElementById("name_id").value.trim().toLowerCase();
+  const pin = document.getElementById("pin").value.trim();
+  const msgBox = document.getElementById("user-check-msg");
+  const form = document.getElementById("uploadForm");
+
+  if (pin.length !== 4 || isNaN(pin)) {
+    showMessage(msgBox, "❌ Please enter a valid 4-digit PIN.", "red");
+    return;
+  }
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/match_resumes", {
+    const res = await fetch("/store_user_pin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ job_description: jobDesc, name_id: userId }),
+      body: JSON.stringify({ name_id, pin }),
     });
-
     const data = await res.json();
 
-    if (res.ok) {
-      resultDiv.innerHTML = "<h3>Top 3 Matching Resumes</h3>";
-      for (const r of data.results) {
-        const downloadRes = await fetch(`http://127.0.0.1:5000/download_resume/${userId}/${r.file_name}`);
-        const downloadData = await downloadRes.json();
-        const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
-
-        const div = document.createElement("div");
-        div.classList.add("resume-card");
-        div.innerHTML = `
-          <div class="card">
-            <h3><strong>Resume ID:</strong> ${r.name_id}</h3>
-            <p><strong>Email:</strong> ${r.email}</p>
-            <p><strong>Phone:</strong> ${r.phone}</p>
-            <p><strong>Match %:</strong> ${r.match_percent}%</p>
-            <a href="${downloadURL}" target="_blank" download>
-              <button>Download Resume</button>
-            </a>
-          </div>
-        `;
-        resultDiv.appendChild(div);
-      }
+    if (data.success) {
+      showMessage(msgBox, "✅ PIN set. You may now upload resumes.", "green");
+      form.style.display = "block";
+      document.getElementById("hidden_user_id").value = name_id;
+      document.getElementById("hidden_user_pin").value = pin;
     } else {
-      resultDiv.innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
+      showMessage(msgBox, "❌ Failed to set PIN.", "red");
     }
   } catch (err) {
-    resultDiv.innerHTML = "<p style='color:red'>❌ Analysis failed. Please try again.</p>";
+    showMessage(msgBox, "❌ Error storing PIN.", "red");
+    console.error(err);
+  }
+}
+
+// Upload resume
+const uploadForm = document.getElementById("uploadForm");
+uploadForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(uploadForm);
+  const msg = document.getElementById("uploadMsg");
+  showMessage(msg, "Uploading...", "blue");
+
+  try {
+    const res = await fetch("/store_resume", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.message) {
+      showMessage(msg, "✅ " + data.message, "green");
+      uploadForm.reset();
+    } else {
+      showMessage(msg, "❌ " + (data.error || "Upload failed."), "red");
+    }
+  } catch (err) {
+    showMessage(msg, "❌ Error uploading.", "red");
+    console.error(err);
   }
 });
 
-// 🧹 Clear All Resumes
-document.getElementById("clearBtn").addEventListener("click", async function () {
-  const userId = prompt("Enter your Resume ID to clear your own uploaded resumes:");
-  const msg = document.getElementById("uploadMsg");
-  msg.textContent = "🧹 Clearing resumes...";
+// Analyze resumes
+const analyzeForm = document.getElementById("analyzeForm");
+analyzeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name_id = document.getElementById("analyze_user_id").value.trim().toLowerCase();
+  const pin = document.getElementById("analyze_pin").value.trim();
+  const jd = document.getElementById("required_skills").value.trim();
+  const resultsBox = document.getElementById("results");
+
+  if (!name_id || !pin || pin.length !== 4 || !jd) {
+    showMessage(resultsBox, "❌ Please provide Resume ID, 4-digit PIN, and job description.", "red");
+    return;
+  }
+
+  showMessage(resultsBox, "Analyzing resumes, please wait...", "blue");
 
   try {
-    const res = await fetch(`http://127.0.0.1:5000/clear_resumes?name_id=${userId}`, {
-      method: "DELETE",
+    const verify = await fetch(`/verify_pin?name_id=${encodeURIComponent(name_id)}&pin=${encodeURIComponent(pin)}`);
+    const verifyData = await verify.json();
+
+    if (!verifyData.valid) {
+      showMessage(resultsBox, "❌ Incorrect PIN. Please try again.", "red");
+      return;
+    }
+
+    const res = await fetch("/match_resumes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name_id, pin, job_description: jd }),
     });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("❌ Server responded with error page:", errorText);
+      showMessage(resultsBox, `❌ Server error (${res.status}). Check console for details.`, "red");
+      return;
+    }
+
     const data = await res.json();
 
-    if (res.ok) {
-      msg.textContent = `✅ ${data.message}`;
-      document.getElementById("results").innerHTML = "";
-    } else {
-      msg.textContent = `❌ ${data.error || "Failed to clear resumes."}`;
+    if (!res.ok || !data.results) {
+      showMessage(resultsBox, "❌ " + (data.error || "No results found."), "red");
+      return;
+    }
+
+    resultsBox.innerHTML = `<h3>Top Resume Matches:</h3>`;
+
+    for (const resume of data.results) {
+      const downloadRes = await fetch(`/download_resume/${encodeURIComponent(name_id)}/${encodeURIComponent(resume.file_name)}`);
+      const downloadData = await downloadRes.json();
+      const downloadURL = downloadRes.ok ? downloadData.download_url : "#";
+
+      const card = document.createElement("div");
+      card.className = "resume-card";
+
+
+      card.innerHTML = `
+        <h3><strong>${resume.name_id}</strong></h3>
+        <p><b>Phone:</b> ${resume.phone}</p>
+        <p><b>Email:</b> ${resume.email}</p>
+        <p><b>Match %:</b> ${resume.match_percent}%</p>
+        <a href="${downloadURL}" target="_blank" download>
+          <button style="margin-top: 10px;">⬇️ Download Resume</button>
+        </a>
+      `;
+
+      resultsBox.appendChild(card);
     }
   } catch (err) {
-    msg.textContent = "❌ Error....Please Wait.";
+    showMessage(resultsBox, "❌ Error analyzing resumes.", "red");
+    console.error(err);
   }
+});
+
+// Clear resumes
+const clearBtn = document.getElementById("clearBtn");
+clearBtn.addEventListener("click", async () => {
+  const name_id = prompt("Enter Resume ID to clear:").trim().toLowerCase();
+  const pin = prompt("Enter your 4-digit PIN:");
+
+  if (!name_id || !pin || pin.length !== 4 || isNaN(pin)) {
+    alert("❌ Please enter a valid Resume ID and 4-digit PIN.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/clear_resumes?name_id=${encodeURIComponent(name_id)}&pin=${encodeURIComponent(pin)}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+    if (data.message) alert("✅ " + data.message);
+    else alert("❌ " + (data.error || "Failed to clear resumes."));
+  } catch (err) {
+    alert("❌ Error clearing resumes.");
+    console.error(err);
+  }
+});
+
+// Init listeners
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("checkIdBtn").addEventListener("click", checkUserIdBeforeUpload);
 });

@@ -1,3 +1,4 @@
+<!-- feature2.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,76 +6,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Resume Analyzer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="./static/feature2.css">
+  <link rel="stylesheet" href="./static/feature2.css" />
 </head>
 <body>
   <div class="container">
     <h1>Résumé Analyzer</h1>
 
-    <!-- Toggle Instructions Button -->
-    <button onclick="toggleInstructions()" style="margin-bottom: 10px;">❓ How to Use This Feature</button>
-
-    <!-- Instruction Box -->
-    <div id="instructionsBox" style="display: none; background: #fffbe6; color: #333; padding: 10px; border-left: 4px solid orange; margin-bottom: 20px;">
-      <p><strong>📘 Instructions:</strong></p>
+  <button onclick="toggleInstructions()" style="margin-bottom: 10px;">❓ How to Use This Feature</button>
+  <div id="instructionsBox" style="display: none; background: #fffbe6; color: #333; padding: 10px; border-left: 4px solid orange; margin-bottom: 20px;">
+  <p><strong>📘 Instructions:</strong></p>
+  <ul>
+    <li><strong>Under the “Upload Resumes” section:</strong>
       <ul>
-        <li> Under the <strong>“Upload Resumes”</strong> section:
-          <ul>
-            <li>Enter a unique <strong>Resume ID</strong> (e.g.,xyz_amazon).</li>
-            <li>Upload one or more PDF resumes under this ID.</li>
-          </ul>
-        </li>
-        <li> Under the <strong>“Analyze Resumes”</strong> section:
-          <ul>
-            <li>Enter the same Resume ID you used earlier.</li>
-            <li>Paste the job description and click Analyze.</li>
-          </ul>
-        </li>
-        <li> Want to start over with new resumes?
-          <ul>
-            <li>Use the same Resume ID and click <strong>"🧹 Clear All Resumes"</strong> to remove the old ones.</li>
-            <li>You can then re-upload under the same ID for a fresh comparison.</li>
-          </ul>
-        </li>
+        <li>Enter a unique <strong>Resume ID</strong> (e.g., xyz_amazon) and click <strong>Next</strong>.</li>
+        <li>If you're a <strong>new user</strong>, you'll be prompted to set a 4-digit PIN for this ID.</li>
+        <li>If you're an <strong>existing user</strong>, enter the 4-digit PIN you previously set.</li>
+        <li><strong>Note:</strong> If you forget your PIN, please use a different Resume ID and set a new PIN after reloading the page.</li>
+        <li>Click the appropriate button — <strong>"Set PIN & Continue"</strong> or <strong>"Verify PIN & Continue"</strong>.</li>
+        <li>Once verified, upload one or more PDF resumes under the same Resume ID for analysis and comparison.</li>
       </ul>
-    </div>
+    </li>
+    <li><strong>Under the “Analyze Resumes” section:</strong>
+      <ul>
+        <li>Enter your Resume ID and 4-digit PIN used during upload.</li>
+        <li>Paste the job description in the text area and click <strong>Analyze</strong>.</li>
+        <li>The system will rank all uploaded resumes based on skill match and display match percentages.</li>
+        <li>You will also get a <strong>download option</strong> for each ranked resume.</li>
+      </ul>
+    </li>
+    <li><strong>To compare a new set of resumes:</strong>
+      <ul>
+        <li>Scroll to the bottom and click <strong>🪩 Clear All Resumes</strong>.</li>
+        <li>Enter your existing Resume ID and correct PIN to delete all associated resumes.</li>
+        <li>You can then reuse the same ID and PIN to upload a fresh batch of resumes.</li>
+      </ul>
+    </li>
+  </ul>
+</div>
 
     <!-- Upload Section -->
     <h2><i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Upload Resumes</h2>
-    <input type="text" id="name_id" name="name_id" placeholder="Enter Resume ID" required>
-    <button onclick="checkUserIdBeforeUpload()">Next</button>
-    <div id="user-check-msg" style="display: none; color: red; margin-top: 10px;"></div>
-    <div id="new-user-msg" style="display: none; color: green; margin-top: 10px;"></div>
+    <div class="upload-inputs">
+      <input type="text" id="name_id" name="name_id" placeholder="Enter Resume ID" required />
+      <button id="checkIdBtn" type="button">Next</button>
+
+      <div id="pin-container" style="display: none; margin-top: 10px;">
+        <p id="pin-label" style="margin: 4px 0;">Enter your 4-digit PIN:</p>
+        <div style="display: flex; gap: 10px;">
+          <input type="password" id="pin" name="pin" placeholder="4-digit PIN" maxlength="4" pattern="\d{4}" />
+          <!-- The verify/set PIN buttons will be dynamically inserted here by JS -->
+        </div>
+      </div>
+
+      <div id="user-check-msg" style="display: none; color: red; margin-top: 10px;"></div>
+      <div id="new-user-msg" style="display: none; color: green; margin-top: 10px;"></div>
+    </div>
 
     <form id="uploadForm" style="display: none; margin-top: 15px;">
       <label for="file">Upload Resume (PDF):</label>
-      <input type="file" name="file" id="file" required>
-      <input type="hidden" name="name_id" id="hidden_user_id">
+      <input type="file" name="resume" id="file" accept="application/pdf" required />
+      <input type="hidden" name="name_id" id="hidden_user_id" />
+      <input type="hidden" name="pin" id="hidden_user_pin" />
       <button type="submit">Upload</button>
       <p id="uploadMsg" class="status"></p>
     </form>
 
-    <!--  Analyze Section -->
+    <!-- Analyze Section -->
     <h2><i class="fa-brands fa-searchengin fa-bounce"></i> Analyze Resumes</h2>
     <form id="analyzeForm">
-      <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required>
+      <input type="text" id="analyze_user_id" placeholder="Enter your Resume ID" required />
+      <input type="password" id="analyze_pin" placeholder="Enter 4-digit PIN" maxlength="4" required />
       <textarea id="required_skills" rows="6" placeholder="Paste job description here..." required></textarea>
       <button type="submit">Analyze</button>
     </form>
 
-    <!--  Results -->
+    <!-- Results -->
     <div id="results"></div>
 
     <!-- Clear Button -->
-    <button id="clearBtn">🧹 Clear All Resumes</button>
+    <button id="clearBtn" type="button">🪩 Clear All Resumes</button>
   </div>
 
-  <script>
-    function toggleInstructions() {
-      const box = document.getElementById("instructionsBox");
-      box.style.display = box.style.display === "none" ? "block" : "none";
-    }
-  </script>
   <script src="./static/feature2.js"></script>
 </body>
 </html>
