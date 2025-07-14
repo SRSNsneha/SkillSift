@@ -14,7 +14,7 @@ load_dotenv()
 
 
 feature2_routes = Blueprint("feature2", __name__)
-CORS(feature2_routes)  # ✅ CORS only for this blueprint
+CORS(feature2_routes)  # CORS only for this blueprint
 
 @feature2_routes.route("/feature2")
 def feature1_page():
@@ -84,7 +84,6 @@ def store_resume():
     local_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(local_path)
 
-    # Upload to Supabase Storage using PUT instead of POST
     with open(local_path, "rb") as f:
         upload_res = requests.put(
             f"{SUPABASE_URL}/storage/v1/object/{SUPABASE_BUCKET}/{name_id}/{filename}",

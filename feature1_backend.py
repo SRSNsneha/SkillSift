@@ -8,9 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 feature1_routes = Blueprint("feature1", __name__)
-CORS(feature1_routes)  # ✅ CORS only for this blueprint
+CORS(feature1_routes)  # CORS only for this blueprint
 
-# DO NOT initialize Flask app here
 
 @feature1_routes.route("/feature1")
 def feature1_page():
