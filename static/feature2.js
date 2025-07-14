@@ -1,4 +1,5 @@
-//feature2.js
+// feature2.js — Cleaned and Working JavaScript for Resume Analyzer
+
 // Helper to show messages nicely
 function showMessage(elem, text, color = "black", display = "block") {
   elem.innerHTML = text;
