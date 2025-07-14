@@ -28,7 +28,7 @@ SkillSift is a smart resume analyzer built using Flask that provides two powerfu
 This feature allows users to securely upload and manage multiple resumes tied to a **unique Resume ID**, and later analyze them all against a job description. All actions are protected using a **4-digit PIN**, ensuring privacy and ownership of uploaded resumes.
 
 #### 🔐 Step 1: Resume Upload (Secure)
-- Users start by entering a **Resume ID** (e.g., `john_google`) and clicking **Next**.
+- Users start by entering a **Resume ID** (e.g., `xyz_123`) and clicking **Next**.
 - If the Resume ID is **new**, you're prompted to set a **4-digit PIN** for future access.
 - If the Resume ID already exists, you're prompted to **verify your PIN**.
 - After verification, upload one or more **PDF resumes** under that ID.
