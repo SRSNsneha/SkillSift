@@ -128,3 +128,17 @@ body {
 .card a button:hover {
   background-color: #4f46e5;
 }
+
+#visitCounter {
+  position: fixed;
+  bottom: 20px;   
+  right: 20px;    
+  color: black;
+  font-size: 18px;
+  margin: 0;       
+  padding: 8px 12px; 
+  border-radius: 6px; 
+  box-shadow: 0 0 5px rgba(0,0,0,0.2); 
+  text-align: center;
+  user-select: none; 
+}

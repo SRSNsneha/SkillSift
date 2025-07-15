@@ -22,6 +22,14 @@ function updateDots() {
     }
   }
 }
+fetch("https://skillsift.onrender.com/visitor_count")
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("visitCounter").innerText = "👀 : " + data.count;
+    })
+    .catch(() => {
+      document.getElementById("visitCounter").innerText = "👀 : N/A";
+    });
 
 // Initial background + dot
 document.body.style.backgroundImage = images[currentIndex];

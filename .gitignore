@@ -3,3 +3,4 @@ temp_resumes/
 __pycache__/
 .env
 *.pyc
+visitor_counter.txt
