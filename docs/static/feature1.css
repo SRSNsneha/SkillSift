@@ -7,10 +7,10 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #2a0d0d; /* Dark reddish base fallback */
+  background: #2a0d0d; 
   color: #f0e9e9;
   padding: 40px 20px;
-  background-image: url('./resume9.png'); /* Your red background image */
+  background-image: url('./resume9.png'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
