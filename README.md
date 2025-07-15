@@ -1,6 +1,6 @@
 # SkillSift – Resume Analyzer Web App
 
-SkillSift is a smart resume analyzer built using Flask that provides two powerful features for job seekers, recruiters, and students to extract insights from resumes and evaluate job fit.
+SkillSift is a resume analyzer web application built with Flask. It offers two main features to help users upload, compare, and analyze resumes based on job descriptions. Whether you're checking a single resume or ranking multiple ones, SkillSift helps match skills, highlight gaps, and show how well a resume fits the job.
 
 ---
 ### 🚀 Live Demo
