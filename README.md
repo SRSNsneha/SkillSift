@@ -52,7 +52,11 @@ This feature allows users to securely upload and manage multiple resumes tied to
 
 ### 🎨 Homepage Extras
 - The homepage includes navigation to both features.
-- A **background selector** is available to customize the visual theme of the app.
+- A **background selector** cycles through resume-themed images for a personalized visual experience.
+- 👀 A **real-time visitor counter** is displayed at the bottom-right corner of the page.
+  - Tracks the number of unique visits to the site.
+  - Powered by a **Flask API route** connected to a **Supabase database**.
+  - The count is persistent and updates automatically as users visit.
 
 ---
 
