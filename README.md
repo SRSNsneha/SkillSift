@@ -9,22 +9,7 @@ SkillSift is a resume analyzer web application built with Flask. It offers two m
 
 ## 🔥 Features
 
-### ✨ Feature 1: Single Resume Analyzer (Skill Match)
-- Upload a single resume and paste a job description.
-- Automatically extracts:
-  - Name, email, phone  
-  - Education details  
-  - Skills listed in resume
-- Compares resume skills with job description using a preloaded **CSV skill set**.
-- Displays:
-  - Matched and missing skills  
-  - Skill match percentage  
-
-> 💡 Ideal for quick resume checks before applying!
-
----
-
-### 📚 Feature 2: Multi-Resume Ranker with Storage (PIN-Protected)
+### 📚 Feature 1: Multi-Resume Ranker with Storage (PIN-Protected)
 This feature allows users to securely upload and manage multiple resumes tied to a **unique Resume ID**, and later analyze them all against a job description. All actions are protected using a **4-digit PIN**, ensuring privacy and ownership of uploaded resumes.
 
 #### 🔐 Step 1: Resume Upload (Secure)
@@ -47,6 +32,21 @@ This feature allows users to securely upload and manage multiple resumes tied to
 ✅ This entire flow is **PIN-protected** — only users with the correct PIN for a Resume ID can upload, analyze, or delete resumes. Unauthorized attempts are blocked.
 
 > 📂 Use “Clear All Resumes” to delete your data and start fresh under the same Resume ID.
+
+---
+
+### ✨ Feature 2: Single Resume Analyzer (Skill Match)
+- Upload a single resume and paste a job description.
+- Automatically extracts:
+  - Name, email, phone  
+  - Education details  
+  - Skills listed in resume
+- Compares resume skills with job description using a preloaded **CSV skill set**.
+- Displays:
+  - Matched and missing skills  
+  - Skill match percentage  
+
+> 💡 Ideal for quick resume checks before applying!
 
 ---
 
