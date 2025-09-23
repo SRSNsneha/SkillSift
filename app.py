@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-#sneha
 # Supabase setup
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
